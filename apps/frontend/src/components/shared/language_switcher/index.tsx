@@ -43,8 +43,12 @@ const getLocales = cache(async (includeSystem: boolean = false, client?: IOptiGr
         queryCache: true
     });
     const sdk = getSdk(currentClient);
-    const locales = (await sdk.getLocales().catch((e: { response: { code: string, status: number, system: { message: string, auth: string} }}) => {
-        console.error(`❌ [Optimizely Graph] [Error] ${e.response.code} ${e.response.system.message} ${e.response.system.auth}`)
+   const locales = (await sdk.getLocales().catch((e: any) => {
+        const code = e?.response?.code ?? e?.code ?? 'UNKNOWN'
+        const status = e?.response?.status ?? e?.status
+        const message = e?.response?.system?.message ?? e?.message ?? 'Unknown error'
+        const auth = e?.response?.system?.auth ?? ''
+        console.error(`❌ [Optimizely Graph] [Error] ${code}${status ? ` (${status})` : ''} ${message} ${auth}`)
         return undefined
     }))?.schema?.types?.filter(x => x.kind == "ENUM" && x.name?.endsWith("Locales"))?.map(x => (x.enumValues ?? []).map(y => y.name))?.flat()?.filter((v,i,a) => i <= a.indexOf(v)) ?? []
     return includeSystem ? locales : locales.filter(x => x != 'ALL' && x != 'NEUTRAL')
