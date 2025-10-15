@@ -27,7 +27,8 @@ export default async function SiteHeader({ locale, ctx }: HeaderProps)
         queryCache: true
     });
 
-    const headerData = await getSdk(currentClient).getHeaderData({
+    const disableLayoutQueries = process.env.DISABLE_LAYOUT_QUERIES === '1'
+    const headerData = disableLayoutQueries ? undefined : await getSdk(currentClient).getHeaderData({
         locale: currentLocale,
         domain: currentDomain
     }).then(x => x.appLayout?.items?.at(0)).catch((e: any) => {
@@ -49,5 +50,4 @@ export default async function SiteHeader({ locale, ctx }: HeaderProps)
             <MobileMenu menuItems={ headerData?.mainMenu } serviceItems={ headerData?.serviceButtons } ctx={ ctx } />
         </div>
     </header>
-
 }
