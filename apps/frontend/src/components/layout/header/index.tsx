@@ -30,8 +30,12 @@ export default async function SiteHeader({ locale, ctx }: HeaderProps)
     const headerData = await getSdk(currentClient).getHeaderData({
         locale: currentLocale,
         domain: currentDomain
-    }).then(x => x.appLayout?.items?.at(0)).catch((e: { response: { code: string, status: number, system: { message: string, auth: string} }}) => {
-        console.error(`❌ [Optimizely Graph] [Error] ${e.response.code} ${e.response.system.message} ${e.response.system.auth}`)
+    }).then(x => x.appLayout?.items?.at(0)).catch((e: any) => {
+        const code = e?.response?.code ?? e?.code ?? 'UNKNOWN'
+        const status = e?.response?.status ?? e?.status
+        const message = e?.response?.system?.message ?? e?.message ?? 'Unknown error'
+        const auth = e?.response?.system?.auth ?? ''
+        console.error(`❌ [Optimizely Graph] [Error] ${code}${status ? ` (${status})` : ''} ${message} ${auth}`)
         return undefined
     })
 
@@ -45,4 +49,5 @@ export default async function SiteHeader({ locale, ctx }: HeaderProps)
             <MobileMenu menuItems={ headerData?.mainMenu } serviceItems={ headerData?.serviceButtons } ctx={ ctx } />
         </div>
     </header>
+
 }
