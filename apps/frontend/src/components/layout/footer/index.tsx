@@ -21,7 +21,8 @@ export async function SiteFooter({locale, ctx }: SiteFooterProps)
         queryCache: true
     })
     const footerLocale = locale ?? contextLocale
-    const footerData = (await getSdk(graphClient).getFooterData({
+    const disableLayoutQueries = process.env.DISABLE_LAYOUT_QUERIES === '1'
+    const footerData = disableLayoutQueries ? undefined : (await getSdk(graphClient).getFooterData({
         locale: footerLocale ? localeToGraphLocale(footerLocale) as Locales : Locales.ALL
     }).catch((e: any) => {
         const code = e?.response?.code ?? e?.code ?? 'UNKNOWN'
@@ -59,6 +60,5 @@ export async function SiteFooter({locale, ctx }: SiteFooterProps)
         </div>
     </footer>
 }
-
 
 export default SiteFooter
